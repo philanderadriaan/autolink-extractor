@@ -19,10 +19,7 @@ public class Main
 
   public static void main(String[] args) throws Exception
   {
-
-    new Thread(() -> {
-      flush();
-    }).start();
+    flush();
     Properties properties = new Properties();
     properties.load(new FileInputStream("properties.properties"));
     File sourceDirectory = new File(properties.getProperty("source"));
@@ -120,24 +117,26 @@ public class Main
 
   private static void flush()
   {
-    try
-    {
-      Clip clip = AudioSystem.getClip();
-      clip.open(AudioSystem.getAudioInputStream(new File("flush.wav")));
-      clip.start();
-      while (!clip.isRunning())
+    new Thread(() -> {
+      try
       {
-        Thread.sleep(100);
+        Clip clip = AudioSystem.getClip();
+        clip.open(AudioSystem.getAudioInputStream(new File("flush.wav")));
+        clip.start();
+        while (!clip.isRunning())
+        {
+          Thread.sleep(100);
+        }
+        while (clip.isRunning())
+        {
+          Thread.sleep(100);
+        }
+        clip.close();
       }
-      while (clip.isRunning())
+      catch (Exception exception)
       {
-        Thread.sleep(100);
-      }
-      clip.close();
-    }
-    catch (Exception exception)
-    {
 
-    }
+      }
+    }).start();
   }
 }
