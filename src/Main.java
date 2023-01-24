@@ -30,35 +30,36 @@ public class Main
 
     Files.lines(Paths.get(destinationDirectory.getAbsolutePath() + "\\NAME.txt"))
         .forEach(name -> {
-          try
+
+          for (File characterDirectory : destinationDirectory.listFiles())
           {
-            for (File characterDirectory : destinationDirectory.listFiles())
+            if (characterDirectory.isDirectory() && characterDirectory.getName().equals(name))
             {
-              if (characterDirectory.isDirectory() &&
-                  characterDirectory.getName().equals(name))
-              {
-                Log.log("Delete " + characterDirectory.getAbsolutePath());
-                characterDirectory.delete();
-              }
+              Log.log("Delete " + characterDirectory.getAbsolutePath());
+              characterDirectory.delete();
             }
-            for (File archiveFile : sourceDirectory.listFiles())
+          }
+          for (File archiveFile : sourceDirectory.listFiles())
+          {
+            if (archiveFile.isFile() &&
+                archiveFile.getName().toUpperCase().startsWith(name.toUpperCase()))
             {
-              if (archiveFile.isFile() && archiveFile.getName().toUpperCase()
-                  .startsWith(name.substring(0, 3).toUpperCase()))
+              try
               {
                 if (extract(archiveFile, destinationDirectory.getAbsolutePath(), name, 1))
                 {
                   extract(archiveFile, destinationDirectory.getAbsolutePath(), name, 2);
                 }
-                skipSet.remove(archiveFile.getName());
               }
+              catch (Exception e)
+              {
+                exceptionSet.add(e.getMessage());
+                e.printStackTrace();
+              }
+              skipSet.remove(archiveFile.getName());
             }
           }
-          catch (Exception e)
-          {
-            exceptionSet.add(e.getMessage());
-            e.printStackTrace();
-          }
+
         });
     Audio.flush();
     for (String skip : skipSet)
