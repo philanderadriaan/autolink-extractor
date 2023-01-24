@@ -4,9 +4,9 @@ import java.io.FileOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -19,13 +19,17 @@ public class Main
 
   public static void main(String[] args) throws Exception
   {
-    flush();
+
+    new Thread(() -> {
+      flush();
+    }).start();
     Properties properties = new Properties();
     properties.load(new FileInputStream("properties.properties"));
     File sourceDirectory = new File(properties.getProperty("source"));
     File destinationDirectory = new File(properties.getProperty("destination"));
 
-    Set<String> skipSet = new TreeSet<String>();
+    Set<String> exceptionSet = new HashSet<String>();
+    Set<String> skipSet = new HashSet<String>();
     for (File sourceFile : sourceDirectory.listFiles())
     {
       skipSet.add(sourceFile.getName());
@@ -59,6 +63,7 @@ public class Main
           }
           catch (Exception exception)
           {
+            exceptionSet.add(exception.getMessage());
             exception.printStackTrace();
           }
         });
@@ -67,6 +72,10 @@ public class Main
     for (String skip : skipSet)
     {
       log("Skip " + skip);
+    }
+    for (String exception : exceptionSet)
+    {
+      log(exception);
     }
   }
 
@@ -109,19 +118,26 @@ public class Main
     System.out.println(new Date() + "\t" + message);
   }
 
-  private static void flush() throws Exception
+  private static void flush()
   {
-    Clip clip = AudioSystem.getClip();
-    clip.open(AudioSystem.getAudioInputStream(new File("flush.wav")));
-    clip.start();
-    while (!clip.isRunning())
+    try
     {
-      Thread.sleep(100);
+      Clip clip = AudioSystem.getClip();
+      clip.open(AudioSystem.getAudioInputStream(new File("flush.wav")));
+      clip.start();
+      while (!clip.isRunning())
+      {
+        Thread.sleep(100);
+      }
+      while (clip.isRunning())
+      {
+        Thread.sleep(100);
+      }
+      clip.close();
     }
-    while (clip.isRunning())
+    catch (Exception exception)
     {
-      Thread.sleep(100);
+
     }
-    clip.close();
   }
 }
