@@ -41,8 +41,8 @@ public class Main
           }
           for (File archiveFile : sourceDirectory.listFiles())
           {
-            if (archiveFile.isFile() &&
-                archiveFile.getName().toUpperCase().startsWith(name.toUpperCase()))
+            if (archiveFile.isFile() && archiveFile.getName().toUpperCase()
+                .startsWith(name.substring(0, 3).toUpperCase()))
             {
               try
               {
