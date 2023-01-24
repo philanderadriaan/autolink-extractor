@@ -3,13 +3,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
-
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
 
 import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry;
 import org.apache.commons.compress.archivers.sevenz.SevenZFile;
@@ -19,7 +15,7 @@ public class Main
 
   public static void main(String[] args) throws Exception
   {
-    flush();
+    Audio.flush();
     Properties properties = new Properties();
     properties.load(new FileInputStream("properties.properties"));
     File sourceDirectory = new File(properties.getProperty("source"));
@@ -41,7 +37,7 @@ public class Main
               if (characterDirectory.isDirectory() &&
                   characterDirectory.getName().equals(name))
               {
-                log("Delete " + characterDirectory.getAbsolutePath());
+                Log.log("Delete " + characterDirectory.getAbsolutePath());
                 characterDirectory.delete();
               }
             }
@@ -58,21 +54,20 @@ public class Main
               }
             }
           }
-          catch (Exception exception)
+          catch (Exception e)
           {
-            exceptionSet.add(exception.getMessage());
-            exception.printStackTrace();
+            exceptionSet.add(e.getMessage());
+            e.printStackTrace();
           }
         });
-
-    flush();
+    Audio.flush();
     for (String skip : skipSet)
     {
-      log("Skip " + skip);
+      Log.log("Skip " + skip);
     }
     for (String exception : exceptionSet)
     {
-      log(exception);
+      Log.log(exception);
     }
   }
 
@@ -83,8 +78,8 @@ public class Main
     File characterDirectory = new File(destinationDirectoryPath + "\\" + name + "\\" +
                                        String.format("%02d", sequence));
     Files.createDirectories(Paths.get(characterDirectory.getAbsolutePath()));
-    log("Extract " + archiveFile.getAbsolutePath() + " to " +
-        characterDirectory.getAbsolutePath());
+    Log.log("Extract " + archiveFile.getAbsolutePath() + " to " +
+            characterDirectory.getAbsolutePath());
     boolean hasPhys = false;
     SevenZFile sevenZFile = new SevenZFile(archiveFile);
     SevenZArchiveEntry sevenZArchiveEntry = sevenZFile.getNextEntry();
@@ -92,7 +87,7 @@ public class Main
     {
       if (sequence == 1 || !sevenZArchiveEntry.getName().toUpperCase().endsWith(".---C"))
       {
-        log(sevenZArchiveEntry.getName());
+        Log.log(sevenZArchiveEntry.getName());
         FileOutputStream fileOutputStream =
             new FileOutputStream(characterDirectory + "\\" + sevenZArchiveEntry.getName());
         byte[] bytes = new byte[(int) sevenZArchiveEntry.getSize()];
@@ -108,35 +103,5 @@ public class Main
     }
     sevenZFile.close();
     return hasPhys;
-  }
-
-  private static void log(String message)
-  {
-    System.out.println(new Date() + "\t" + message);
-  }
-
-  private static void flush()
-  {
-    new Thread(() -> {
-      try
-      {
-        Clip clip = AudioSystem.getClip();
-        clip.open(AudioSystem.getAudioInputStream(new File("flush.wav")));
-        clip.start();
-        while (!clip.isRunning())
-        {
-          Thread.sleep(100);
-        }
-        while (clip.isRunning())
-        {
-          Thread.sleep(100);
-        }
-        clip.close();
-      }
-      catch (Exception exception)
-      {
-
-      }
-    }).start();
   }
 }
