@@ -8,6 +8,9 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+
 import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry;
 import org.apache.commons.compress.archivers.sevenz.SevenZFile;
 
@@ -16,8 +19,9 @@ public class Main
 
   public static void main(String[] args) throws Exception
   {
+    flush();
     Properties properties = new Properties();
-    properties.load(new FileInputStream("Properties.properties"));
+    properties.load(new FileInputStream("properties.properties"));
     File sourceDirectory = new File(properties.getProperty("source"));
     File destinationDirectory = new File(properties.getProperty("destination"));
 
@@ -58,6 +62,8 @@ public class Main
             exception.printStackTrace();
           }
         });
+
+    flush();
     for (String skip : skipSet)
     {
       log("Skip " + skip);
@@ -101,5 +107,21 @@ public class Main
   private static void log(String message)
   {
     System.out.println(new Date() + "\t" + message);
+  }
+
+  private static void flush() throws Exception
+  {
+    Clip clip = AudioSystem.getClip();
+    clip.open(AudioSystem.getAudioInputStream(new File("flush.wav")));
+    clip.start();
+    while (!clip.isRunning())
+    {
+      Thread.sleep(100);
+    }
+    while (clip.isRunning())
+    {
+      Thread.sleep(100);
+    }
+    clip.close();
   }
 }
