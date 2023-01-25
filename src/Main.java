@@ -69,9 +69,9 @@ public class Main
     {
       LogUtil.out("Skip " + skip);
     }
-    for (String ex : errSet)
+    for (String err : errSet)
     {
-      LogUtil.err(ex);
+      LogUtil.err(err);
     }
     WavUtil.flush();
   }
