@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
-import java.util.Random;
 import java.util.Set;
 
 import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry;
@@ -17,8 +16,6 @@ import org.apache.commons.io.FileUtils;
 
 public class Main
 {
-  private static final Random RANDOM = new Random();
-
   public static void main(String[] args) throws Exception
   {
     Properties properties = new Properties();
