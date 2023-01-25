@@ -18,47 +18,47 @@ public class Main
 {
   public static void main(String[] args) throws Exception
   {
-    Properties properties = new Properties();
-    properties.load(new FileInputStream("properties.properties"));
-    File sourceDirectory = new File(properties.getProperty("source"));
-    File destinationDirectory = new File(properties.getProperty("destination"));
+    Properties prop = new Properties();
+    prop.load(new FileInputStream("cfg.properties"));
+    File srcDir = new File(prop.getProperty("src"));
+    File destDir = new File(prop.getProperty("dest"));
 
-    Set<String> exceptionSet = new HashSet<String>();
+    Set<String> exSet = new HashSet<String>();
     Set<String> skipSet = new HashSet<String>();
-    for (File sourceFile : sourceDirectory.listFiles())
+    for (File srcFile : srcDir.listFiles())
     {
-      skipSet.add(sourceFile.getName());
+      skipSet.add(srcFile.getName());
     }
 
     List<String> nameList =
-        Files.readAllLines(Paths.get(destinationDirectory.getAbsolutePath() + "\\NAME.txt"));
+        Files.readAllLines(Paths.get(destDir.getAbsolutePath() + "\\NAME.txt"));
     Collections.shuffle(nameList);
 
     for (String name : nameList)
     {
-      for (File characterDirectory : destinationDirectory.listFiles())
+      for (File charDir : destDir.listFiles())
       {
-        if (characterDirectory.isDirectory() && characterDirectory.getName().equals(name))
+        if (charDir.isDirectory() && charDir.getName().equals(name))
         {
-          LogUtility.log("Delete " + characterDirectory.getAbsolutePath());
-          FileUtils.deleteDirectory(characterDirectory);
+          LogUtil.out("Delete " + charDir.getAbsolutePath());
+          FileUtils.deleteDirectory(charDir);
         }
       }
-      for (File archiveFile : sourceDirectory.listFiles())
+      for (File archiveFile : srcDir.listFiles())
       {
         if (archiveFile.isFile() &&
             archiveFile.getName().toUpperCase().startsWith(name.substring(0, 3).toUpperCase()))
         {
           try
           {
-            if (extract(archiveFile, destinationDirectory.getAbsolutePath(), name, 1))
+            if (extract(archiveFile, destDir.getAbsolutePath(), name, 1))
             {
-              extract(archiveFile, destinationDirectory.getAbsolutePath(), name, 2);
+              extract(archiveFile, destDir.getAbsolutePath(), name, 2);
             }
           }
           catch (Exception e)
           {
-            exceptionSet.add(e.getMessage());
+            exSet.add(e.getMessage());
             e.printStackTrace();
           }
           skipSet.remove(archiveFile.getName());
@@ -67,49 +67,49 @@ public class Main
     }
     for (String skip : skipSet)
     {
-      LogUtility.log("Skip " + skip);
+      LogUtil.out("Skip " + skip);
     }
-    for (String exception : exceptionSet)
+    for (String ex : exSet)
     {
-      LogUtility.log(exception);
+      LogUtil.err(ex);
     }
-    AudioUtility.flush();
+    WavUtil.flush();
   }
 
-  private static boolean extract(File archiveFile, String destinationDirectoryPath,
+  private static boolean extract(File archiveFile, String destDirPath,
                                  String name, int costume)
       throws Exception
   {
-    File characterDirectory = new File(destinationDirectoryPath + "\\" + name + "\\" +
+    File charDir = new File(destDirPath + "\\" + name + "\\" +
                                        String.format("%02d", costume));
-    Files.createDirectories(Paths.get(characterDirectory.getAbsolutePath()));
-    LogUtility.log("Extract " + archiveFile.getAbsolutePath() + " to " +
-                   characterDirectory.getAbsolutePath());
+    Files.createDirectories(Paths.get(charDir.getAbsolutePath()));
+    LogUtil.out("Extract " + archiveFile.getAbsolutePath() + " to " +
+                   charDir.getAbsolutePath());
     boolean hasPhys = false;
-    SevenZFile sevenZFile = new SevenZFile(archiveFile);
-    SevenZArchiveEntry sevenZArchiveEntry = sevenZFile.getNextEntry();
-    while (sevenZArchiveEntry != null)
+    SevenZFile zFile = new SevenZFile(archiveFile);
+    SevenZArchiveEntry zEntry = zFile.getNextEntry();
+    while (zEntry != null)
     {
-      if (!sevenZArchiveEntry.isDirectory() &&
+      if (!zEntry.isDirectory() &&
           (costume == 1 ||
-           !FileNameUtils.getExtension(sevenZArchiveEntry.getName()).equalsIgnoreCase("---C")))
+           !FileNameUtils.getExtension(zEntry.getName()).equalsIgnoreCase("---C")))
       {
-        LogUtility.log(sevenZArchiveEntry.getName());
-        FileOutputStream fileOutputStream =
-            new FileOutputStream(characterDirectory + "\\" + sevenZArchiveEntry.getName()
-                .substring(sevenZArchiveEntry.getName().lastIndexOf('/') + 1));
-        byte[] bytes = new byte[(int) sevenZArchiveEntry.getSize()];
-        sevenZFile.read(bytes, 0, bytes.length);
-        fileOutputStream.write(bytes);
-        fileOutputStream.close();
-        if (FileNameUtils.getExtension(sevenZArchiveEntry.getName()).equalsIgnoreCase("PHYD"))
+        LogUtil.out(zEntry.getName());
+        FileOutputStream stream =
+            new FileOutputStream(charDir + "\\" + zEntry.getName()
+                .substring(zEntry.getName().lastIndexOf('/') + 1));
+        byte[] bytes = new byte[(int) zEntry.getSize()];
+        zFile.read(bytes, 0, bytes.length);
+        stream.write(bytes);
+        stream.close();
+        if (FileNameUtils.getExtension(zEntry.getName()).equalsIgnoreCase("PHYD"))
         {
           hasPhys = true;
         }
       }
-      sevenZArchiveEntry = sevenZFile.getNextEntry();
+      zEntry = zFile.getNextEntry();
     }
-    sevenZFile.close();
+    zFile.close();
     return hasPhys;
   }
 }
