@@ -12,6 +12,7 @@ import java.util.Set;
 import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry;
 import org.apache.commons.compress.archivers.sevenz.SevenZFile;
 import org.apache.commons.compress.utils.FileNameUtils;
+import org.apache.commons.io.FileUtils;
 
 public class Main
 {
@@ -41,7 +42,7 @@ public class Main
         if (characterDirectory.isDirectory() && characterDirectory.getName().equals(name))
         {
           LogUtility.log("Delete " + characterDirectory.getAbsolutePath());
-          characterDirectory.delete();
+          FileUtils.deleteDirectory(characterDirectory);
         }
       }
       for (File archiveFile : sourceDirectory.listFiles())
