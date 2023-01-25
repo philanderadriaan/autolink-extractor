@@ -11,6 +11,7 @@ import java.util.Set;
 
 import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry;
 import org.apache.commons.compress.archivers.sevenz.SevenZFile;
+import org.apache.commons.compress.utils.FileNameUtils;
 
 public class Main
 {
@@ -90,7 +91,8 @@ public class Main
     while (sevenZArchiveEntry != null)
     {
       if (!sevenZArchiveEntry.isDirectory() &&
-          (sequence == 1 || !sevenZArchiveEntry.getName().toUpperCase().endsWith(".---C")))
+          (sequence == 1 ||
+           !FileNameUtils.getExtension(sevenZArchiveEntry.getName()).equalsIgnoreCase("---C")))
       {
         LogUtility.log(sevenZArchiveEntry.getName());
         FileOutputStream fileOutputStream =
@@ -100,7 +102,7 @@ public class Main
         sevenZFile.read(bytes, 0, bytes.length);
         fileOutputStream.write(bytes);
         fileOutputStream.close();
-        if (sevenZArchiveEntry.getName().toUpperCase().endsWith(".PHYD"))
+        if (FileNameUtils.getExtension(sevenZArchiveEntry.getName()).equalsIgnoreCase("PHYD"))
         {
           hasPhys = true;
         }
