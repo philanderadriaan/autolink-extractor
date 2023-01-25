@@ -21,42 +21,6 @@ public class Main
 
   public static void main(String[] args) throws Exception
   {
-//    
-//    Map<String, List<List<String>>> audioDirectoryPathMap =
-//        new Gson().fromJson(Files.newBufferedReader(Paths.get("audio.json")), Map.class);
-//    List<String> audioKeyList = new ArrayList<String>(audioDirectoryPathMap.keySet());
-//    String audioKey = audioKeyList.get(RANDOM.nextInt(audioKeyList.size()));
-//
-//    Map<Integer, List<File>> audioFileMap = new HashMap<Integer, List<File>>();
-//    for (int i = 0; i < audioDirectoryPathMap.get(audioKey).size(); i++)
-//    {
-//      if (!audioFileMap.containsKey(i))
-//      {
-//        audioFileMap.put(i, new ArrayList<File>());
-//      }
-//      for (String audioDirectoryPath : audioDirectoryPathMap.get(audioKey).get(i))
-//      {
-//        for (File audioFile : new File(audioDirectoryPath).listFiles())
-//        {
-//          audioFileMap.get(i).add(audioFile);
-//        }
-//      }
-//      Collections.shuffle(audioFileMap.get(i));
-//    }
-//
-//    List<File> playlist = new ArrayList<File>();
-//    playlist.add(audioFileMap.get(1).remove(0));
-//    playlist.add(null);
-//
-//    int streak = 1;
-//    while (!audioFileMap.get(0).isEmpty() && RANDOM.nextDouble() < 1 / Math.log(streak))
-//    {
-//      playlist.add(audioFileMap.get(0).remove(0));
-//      System.out.println(Math.log(streak));
-//      streak++;
-//    }
-//    AudioUtility.playBackground(playlist.toArray(new File[playlist.size()]));
-
     Properties properties = new Properties();
     properties.load(new FileInputStream("properties.properties"));
     File sourceDirectory = new File(properties.getProperty("source"));
