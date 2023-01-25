@@ -23,7 +23,7 @@ public class Main
     File srcDir = new File(prop.getProperty("src"));
     File destDir = new File(prop.getProperty("dest"));
 
-    Set<String> exSet = new HashSet<String>();
+    Set<String> errSet = new HashSet<String>();
     Set<String> skipSet = new HashSet<String>();
     for (File srcFile : srcDir.listFiles())
     {
@@ -58,7 +58,7 @@ public class Main
           }
           catch (Exception e)
           {
-            exSet.add(e.getMessage());
+            errSet.add(e.getMessage());
             e.printStackTrace();
           }
           skipSet.remove(archiveFile.getName());
@@ -69,7 +69,7 @@ public class Main
     {
       LogUtil.out("Skip " + skip);
     }
-    for (String ex : exSet)
+    for (String ex : errSet)
     {
       LogUtil.err(ex);
     }
