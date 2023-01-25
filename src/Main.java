@@ -89,11 +89,13 @@ public class Main
     SevenZArchiveEntry sevenZArchiveEntry = sevenZFile.getNextEntry();
     while (sevenZArchiveEntry != null)
     {
-      if (sequence == 1 || !sevenZArchiveEntry.getName().toUpperCase().endsWith(".---C"))
+      if (!sevenZArchiveEntry.isDirectory() &&
+          (sequence == 1 || !sevenZArchiveEntry.getName().toUpperCase().endsWith(".---C")))
       {
         LogUtility.log(sevenZArchiveEntry.getName());
         FileOutputStream fileOutputStream =
-            new FileOutputStream(characterDirectory + "\\" + sevenZArchiveEntry.getName());
+            new FileOutputStream(characterDirectory + "\\" + sevenZArchiveEntry.getName()
+                .substring(sevenZArchiveEntry.getName().lastIndexOf('/') + 1));
         byte[] bytes = new byte[(int) sevenZArchiveEntry.getSize()];
         sevenZFile.read(bytes, 0, bytes.length);
         fileOutputStream.write(bytes);
