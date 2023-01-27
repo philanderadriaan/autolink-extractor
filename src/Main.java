@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -9,6 +10,9 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
+
 import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry;
 import org.apache.commons.compress.archivers.sevenz.SevenZFile;
 import org.apache.commons.compress.utils.FileNameUtils;
@@ -16,7 +20,8 @@ import org.apache.commons.io.FileUtils;
 
 public class Main
 {
-  public static void main(String[] args) throws Exception
+  public static void main(String[] args) throws InterruptedException, LineUnavailableException,
+      IOException, UnsupportedAudioFileException
   {
     Properties prop = new Properties();
     prop.load(new FileInputStream("prop.properties"));
@@ -76,15 +81,15 @@ public class Main
     WavUtil.flush();
   }
 
-  private static boolean extract(File archiveFile, String destDirPath,
-                                 String name, int costume)
-      throws Exception
+  private static boolean extract(File archiveFile, String destDirPath, String name,
+                                 int costume)
+      throws IOException
+
   {
-    File charDir = new File(destDirPath + "\\" + name + "\\" +
-                                       String.format("%02d", costume));
+    File charDir = new File(destDirPath + "\\" + name + "\\" + String.format("%02d", costume));
     Files.createDirectories(Paths.get(charDir.getAbsolutePath()));
-    LogUtil.out("Extract " + archiveFile.getAbsolutePath() + " to " +
-                   charDir.getAbsolutePath());
+    LogUtil
+        .out("Extract " + archiveFile.getAbsolutePath() + " to " + charDir.getAbsolutePath());
     boolean hasPhys = false;
     SevenZFile zFile = new SevenZFile(archiveFile);
     SevenZArchiveEntry zEntry = zFile.getNextEntry();
@@ -95,9 +100,8 @@ public class Main
            !FileNameUtils.getExtension(zEntry.getName()).equalsIgnoreCase("---C")))
       {
         LogUtil.out(zEntry.getName());
-        FileOutputStream stream =
-            new FileOutputStream(charDir + "\\" + zEntry.getName()
-                .substring(zEntry.getName().lastIndexOf('/') + 1));
+        FileOutputStream stream = new FileOutputStream(charDir + "\\" + zEntry.getName()
+            .substring(zEntry.getName().lastIndexOf('/') + 1));
         byte[] bytes = new byte[(int) zEntry.getSize()];
         zFile.read(bytes, 0, bytes.length);
         stream.write(bytes);
