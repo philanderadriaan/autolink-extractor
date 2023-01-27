@@ -36,7 +36,7 @@ public class Main
     }
 
     List<String> nameList =
-        Files.readAllLines(Paths.get(destDir.getAbsolutePath() + "\\NAME.txt"));
+        Files.readAllLines(Paths.get(destDir.getAbsolutePath() + "/NAME.txt"));
     Collections.shuffle(nameList);
 
     for (String name : nameList)
@@ -86,7 +86,7 @@ public class Main
       throws IOException
 
   {
-    File charDir = new File(destDirPath + "\\" + name + "\\" + String.format("%02d", costume));
+    File charDir = new File(destDirPath + '/' + name + '/' + String.format("%02d", costume));
     Files.createDirectories(Paths.get(charDir.getAbsolutePath()));
     LogUtil
         .out("Extract " + archiveFile.getAbsolutePath() + " to " + charDir.getAbsolutePath());
@@ -100,8 +100,8 @@ public class Main
            !FileNameUtils.getExtension(zEntry.getName()).equalsIgnoreCase("---C")))
       {
         LogUtil.out(zEntry.getName());
-        FileOutputStream stream = new FileOutputStream(charDir + "\\" + zEntry.getName()
-            .substring(zEntry.getName().lastIndexOf('/') + 1));
+        FileOutputStream stream = new FileOutputStream(charDir.getAbsolutePath() + '/' + zEntry
+            .getName().substring(zEntry.getName().lastIndexOf('/') + 1));
         byte[] bytes = new byte[(int) zEntry.getSize()];
         zFile.read(bytes, 0, bytes.length);
         stream.write(bytes);
