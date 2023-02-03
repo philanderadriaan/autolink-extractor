@@ -45,7 +45,7 @@ public class Main
       {
         if (charDir.isDirectory() && charDir.getName().equals(name))
         {
-          LogUtil.out("Delete " + charDir.getAbsolutePath());
+          LogUtil.out("Deleting " + charDir.getAbsolutePath());
           FileUtils.deleteDirectory(charDir);
         }
       }
@@ -72,7 +72,7 @@ public class Main
     }
     for (String skip : skipSet)
     {
-      LogUtil.out("Skip " + skip);
+      LogUtil.out("Skipped " + skip);
     }
     for (String err : errSet)
     {
@@ -89,7 +89,7 @@ public class Main
     File charDir = new File(destDirPath + '/' + name + '/' + String.format("%02d", costume));
     Files.createDirectories(Paths.get(charDir.getAbsolutePath()));
     LogUtil
-        .out("Extract " + archiveFile.getAbsolutePath() + " to " + charDir.getAbsolutePath());
+        .out("Extracting " + archiveFile.getAbsolutePath() + " to " + charDir.getAbsolutePath());
     boolean hasPhys = false;
     SevenZFile zFile = new SevenZFile(archiveFile);
     SevenZArchiveEntry zEntry = zFile.getNextEntry();
